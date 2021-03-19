@@ -24,8 +24,7 @@ def removeSmallAmounts( ip_counts:Dict[str,int], filter:int):
 async def analyzeOrganization(aiomeraki: meraki.aio.AsyncDashboardAPI, orgId:str, days:int) -> Dict[str,int]:
     ret = {}
     timespan = days * 24 * 60 * 60
-    events = await aiomeraki.appliance.getOrganizationApplianceSecurityEvents(orgId, timespan=timespan,total_pages=-1)
-    for e in events:
+    async for e in aiomeraki.appliance.getOrganizationApplianceSecurityEvents(orgId, timespan=timespan,total_pages=-1):
         ip, port = e["srcIp"].rsplit(":",1)
         ip = ip.strip("[]") # remove brackets in case of ipv6
         if not ipaddress.ip_address(ip).is_private: # dont block private ip addresses on the public ip of the firewall
